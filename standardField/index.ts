@@ -1,4 +1,6 @@
+import { text } from "stream/consumers";
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
+import { title } from "process";
 
 export class standardField implements ComponentFramework.StandardControl<IInputs, IOutputs> {
     
@@ -25,20 +27,27 @@ export class standardField implements ComponentFramework.StandardControl<IInputs
         state: ComponentFramework.Dictionary,
         container: HTMLDivElement
     ): void {
-        this._inputElement = document.createElement("input") as HTMLInputElement;
-        this._inputElement.setAttribute("type", "text");
-        this._inputElement.setAttribute("value", context.parameters.sampleProperty.raw || "");
-        container.appendChild(this._inputElement);
-
-        this._inputElement.addEventListener("input", (event) =>
-        {
-            notifyOutputChanged();
+        // init
+        const button: HTMLButtonElement = document.createElement("button");
+        button.innerText = "click me";
+        button.addEventListener("click", () => {
+            const displayValue = `Username: ${context.userSettings.userName}, UserId ${context.userSettings.userId}`;
+            // alert("Hello world!");
+            const alertStrings = {confirmButtonLabel: "Ok", text: displayValue, title: "Title"};
+            const alertOptions = {height: 200, width: 450};
+            // eslint-disable-next-line promise/catch-or-return
+            context.navigation.openAlertDialog(alertStrings, alertOptions).then(
+                function success(result) {
+                    console.log("");
+                    return;
+                }, 
+                function error() {
+                    console.log("error occurred");
+                    return;
+                }
+            );
         });
-
-        // const x = document.createElement("INPUT");
-        // x.setAttribute("type", "text");
-        // x.setAttribute("value", context.parameters.sampleProperty.raw || "");
-        // container.appendChild(x);
+        container.appendChild(button);
     }
 
 
@@ -48,7 +57,6 @@ export class standardField implements ComponentFramework.StandardControl<IInputs
      */
     public updateView(context: ComponentFramework.Context<IInputs>): void {
         // Add code to update control view
-        this._inputElement.setAttribute("value", context.parameters.sampleProperty.raw || "");
     }
 
     /**
@@ -57,7 +65,6 @@ export class standardField implements ComponentFramework.StandardControl<IInputs
      */
     public getOutputs(): IOutputs {
         return {
-            sampleProperty: this._inputElement.value
         };
     }
 
