@@ -1,6 +1,9 @@
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 
 export class standardField implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+    
+    private _inputElement: HTMLInputElement;
+    
     /**
      * Empty constructor.
      */
@@ -22,7 +25,20 @@ export class standardField implements ComponentFramework.StandardControl<IInputs
         state: ComponentFramework.Dictionary,
         container: HTMLDivElement
     ): void {
-        container.appendChild(document.createTextNode("Hello world!!"));
+        this._inputElement = document.createElement("input") as HTMLInputElement;
+        this._inputElement.setAttribute("type", "text");
+        this._inputElement.setAttribute("value", context.parameters.sampleProperty.raw || "");
+        container.appendChild(this._inputElement);
+
+        this._inputElement.addEventListener("input", (event) =>
+        {
+            notifyOutputChanged();
+        });
+
+        // const x = document.createElement("INPUT");
+        // x.setAttribute("type", "text");
+        // x.setAttribute("value", context.parameters.sampleProperty.raw || "");
+        // container.appendChild(x);
     }
 
 
@@ -32,6 +48,7 @@ export class standardField implements ComponentFramework.StandardControl<IInputs
      */
     public updateView(context: ComponentFramework.Context<IInputs>): void {
         // Add code to update control view
+        this._inputElement.setAttribute("value", context.parameters.sampleProperty.raw || "");
     }
 
     /**
@@ -39,7 +56,9 @@ export class standardField implements ComponentFramework.StandardControl<IInputs
      * @returns an object based on nomenclature defined in manifest, expecting object[s] for property marked as "bound" or "output"
      */
     public getOutputs(): IOutputs {
-        return {};
+        return {
+            sampleProperty: this._inputElement.value
+        };
     }
 
     /**
