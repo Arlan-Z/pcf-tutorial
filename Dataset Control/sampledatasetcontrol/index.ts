@@ -1,11 +1,11 @@
-import { text } from "stream/consumers";
+/* eslint-disable no-var */
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
-import { title } from "process";
+import DataSetInterfaces = ComponentFramework.PropertyHelper.DataSetApi;
+type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
-export class standardField implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class sampledatasetcontrol implements ComponentFramework.StandardControl<IInputs, IOutputs> {
     
-    private _inputElement: HTMLInputElement;
-    
+    private _container: HTMLDivElement;
     /**
      * Empty constructor.
      */
@@ -27,27 +27,8 @@ export class standardField implements ComponentFramework.StandardControl<IInputs
         state: ComponentFramework.Dictionary,
         container: HTMLDivElement
     ): void {
-        // init
-        const button: HTMLButtonElement = document.createElement("button");
-        button.innerText = "click me";
-        button.addEventListener("click", () => {
-            const displayValue = `Username: ${context.userSettings.userName}, UserId ${context.userSettings.userId}`;
-            // alert("Hello world!");
-            const alertStrings = {confirmButtonLabel: "Ok", text: displayValue, title: "Title"};
-            const alertOptions = {height: 200, width: 450};
-            // eslint-disable-next-line promise/catch-or-return
-            context.navigation.openAlertDialog(alertStrings, alertOptions).then(
-                function success(result) {
-                    console.log("");
-                    return;
-                }, 
-                function error() {
-                    console.log("error occurred");
-                    return;
-                }
-            );
-        });
-        container.appendChild(button);
+        // container.appendChild(document.createTextNode("Hello World!"));
+        this._container = container;
     }
 
 
@@ -57,6 +38,32 @@ export class standardField implements ComponentFramework.StandardControl<IInputs
      */
     public updateView(context: ComponentFramework.Context<IInputs>): void {
         // Add code to update control view
+        this._container.innerHTML = "";
+        var table = document.createElement("table");
+        var tr = document.createElement("tr");
+        // Table headers
+        context.parameters.sampleDataSet.columns.forEach(function (column: DataSetInterfaces.Column) {
+            var td = document.createElement("td");
+            td.appendChild(document.createTextNode(column.displayName));
+            tr.appendChild(td);
+            table.appendChild(tr);
+            console.log("Column Name: " + column.displayName); 
+        });
+
+        context.parameters.sampleDataSet.sortedRecordIds.forEach(function (recordId: string) {
+            // const record = context.parameters.sampleDataSet.records[recordId];
+            // var email = record.getFormattedValue("Email");
+            // console.log("Email: " + email);
+            var tr = document.createElement("tr");
+            
+            context.parameters.sampleDataSet.columns.forEach(function (column: DataSetInterfaces.Column) {
+                var td = document.createElement("td");
+                td.appendChild(document.createTextNode(context.parameters.sampleDataSet.records[recordId].getFormattedValue(column.name)));
+                tr.appendChild(td);
+            });
+            table.appendChild(tr);
+        });
+        this._container.appendChild(table);
     }
 
     /**
@@ -64,8 +71,7 @@ export class standardField implements ComponentFramework.StandardControl<IInputs
      * @returns an object based on nomenclature defined in manifest, expecting object[s] for property marked as "bound" or "output"
      */
     public getOutputs(): IOutputs {
-        return {
-        };
+        return {};
     }
 
     /**
