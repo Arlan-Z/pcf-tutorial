@@ -43,11 +43,10 @@ export class sampledatasetcontrol implements ComponentFramework.StandardControl<
         var tr = document.createElement("tr");
         // Table headers
         context.parameters.sampleDataSet.columns.forEach(function (column: DataSetInterfaces.Column) {
-            var td = document.createElement("td");
-            td.appendChild(document.createTextNode(column.displayName));
-            tr.appendChild(td);
+            var th = document.createElement("th");
+            th.appendChild(document.createTextNode(column.displayName));
+            tr.appendChild(th);
             table.appendChild(tr);
-            console.log("Column Name: " + column.displayName); 
         });
 
         context.parameters.sampleDataSet.sortedRecordIds.forEach(function (recordId: string) {
